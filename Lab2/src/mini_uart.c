@@ -43,6 +43,10 @@ void uart_init(void) {
           1);  // Enable mini uart (this also enables access to its registers)
     put32(AUX_MU_CNTL_REG, 0);  // Disable auto flow control and disable
                                 // receiver and transmitter (for now)
+    // *** 在這裡加上清除 FIFO 的指令 ***
+    // 寫入 0b110 (0x06) 可以同時清除接收(bit 1)和傳送(bit 2)的 FIFO
+    put32(AUX_MU_IIR_REG, 0x06);
+    
     put32(AUX_MU_IER_REG, 0);     // Disable receive and transmit interrupts
     put32(AUX_MU_LCR_REG, 3);     // Enable 8 bit mode
     put32(AUX_MU_MCR_REG, 0);     // Set RTS line to be always high
@@ -60,4 +64,13 @@ void uart_hex(unsigned int d) {
         uart_send(n);
     }
 }
+void show_boot_menu(void){
+    uart_send_string("Boot Menu:\r\n");
+    uart_send_string(" [U] Upload kernel via mini-UART\r\n");
+    uart_send_string(" [K] use build in kernel\r\n");
+}
 
+char get_user_choice(void){// the return value will be stored in x0
+    uart_send_string("Enter choice: ");
+    return uart_recv();
+}

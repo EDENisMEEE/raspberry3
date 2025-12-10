@@ -13,14 +13,13 @@ proc_hang:
 	b 	proc_hang
 
 master:
-	adr	x0, __bss_start
-	adr	x1, __bss_end
+	adr	x0, bss_begin
+	adr	x1, bss_end
 	sub	x1, x1, x0
 	bl 	memzero
 
-	mov	sp, #LOW_MEMORY 
+	mov	sp, #LOW_MEMORY
 
+	bl  main
 	
-
-	bl	kernel_main
 	b 	proc_hang		// should never come here
