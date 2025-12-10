@@ -57,12 +57,3 @@ void bootloader_main(void) {
     // 如果 kernel 沒成功啟動，這裡可以加個無限迴圈避免執行亂資料
     while (1) { }
 }
-// void bootloader_main(void) {
-//     uart_init();
-//     uart_send_string("Bootloader is alive!\r\n");
-//     // ... 執行 kernel.c 的簡單邏輯
-//     while(1) {
-//         uart_send_string("# ");
-//         uart_recv(); // 隨意接收一個字元
-//     }
-// }
