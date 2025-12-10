@@ -25,7 +25,6 @@ void uart_send_string(char* str) {
 
 void uart_init(void) {
     unsigned int selector;
-
     selector = get32(GPFSEL1);
     selector &= ~(7 << 12);  // clean gpio14
     selector |= 2 << 12;     // set alt5 for gpio14
