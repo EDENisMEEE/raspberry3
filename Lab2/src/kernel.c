@@ -2,10 +2,16 @@
 #include "string.h"
 #include "reboot.h"
 #include "get_baord_revision.h"
+#include "stdint.h"
+#include "shell.h"
+#include "cpio_parse.h"
+
 #define BUFF_MAX 1000
 
 void kernel_main(void) {
-    // uart_init();
+    
+    uart_init();
+    parse_newc((uint8_t*)0x20000000);
     char buffer[BUFF_MAX];
     int cnt = 0;
     while (1) {
@@ -46,6 +52,11 @@ void kernel_main(void) {
         } else if(strcmp(buffer, "revision") == 0){
             uart_send_string("\r\n");
             get_board_revision();
+        }else if(strcmp(buffer, "ls") == 0){
+            cmd_ls();
+        }
+        else if(strcmp(buffer, "cat") == 0){
+            cmd_cat();
         }
         else {
             uart_send_string("\r\n");

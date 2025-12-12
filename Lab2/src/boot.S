@@ -20,6 +20,6 @@ master:
 
 	mov	sp, #LOW_MEMORY
 
-	bl  main
+	bl  kernel_main
 	
 	b 	proc_hang		// should never come here
