@@ -5,6 +5,7 @@
 #include "stdint.h"
 #include "shell.h"
 #include "cpio_parse.h"
+#include "simple_malloc.h"
 
 #define BUFF_MAX 1000
 
@@ -12,6 +13,7 @@ void kernel_main(void) {
     
     uart_init();
     parse_newc((uint8_t*)0x20000000);
+   
     char buffer[BUFF_MAX];
     int cnt = 0;
     while (1) {
@@ -57,6 +59,9 @@ void kernel_main(void) {
         }
         else if(strcmp(buffer, "cat") == 0){
             cmd_cat();
+        }
+        else if(strcmp(buffer, "malloc") == 0){
+            simple_malloc(8);
         }
         else {
             uart_send_string("\r\n");
