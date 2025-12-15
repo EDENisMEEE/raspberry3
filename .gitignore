@@ -1,5 +1,6 @@
 firmware/
 build/
+img_files/
 *.img
 *.pdf
 .clang-format
