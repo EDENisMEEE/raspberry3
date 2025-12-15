@@ -1,6 +1,5 @@
 kernel_old=1
 disable_commandline_tags=1
 core_freq=250
-kernel_address=0x60000
 kernel=bootloader.img
 initramfs initramfs.cpio 0x20000000
