@@ -5,6 +5,9 @@
 .globl _start
 _start:
 	
+    adrp  x1, dtb_ptr_glob
+    add   x1, x1, :lo12:dtb_ptr_glob
+    str   x0, [x1]    // 把原始的 x0 (DTB 位址) 存進去
 	//運行時位址 The real address of start_(0x80000)
 	adr x0, _start
 	//連結時位址 This is where the linker wants _start is on(defined in linker file)
@@ -49,7 +52,7 @@ master:
 	bl 	memzero
 
 	mov	sp, #LOW_MEMORY
-
+	mov x0, x20
 	bl  main
 	
 	b 	proc_hang		// should never come here

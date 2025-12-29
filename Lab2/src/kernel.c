@@ -6,14 +6,19 @@
 #include "shell.h"
 #include "cpio_parse.h"
 #include "simple_malloc.h"
-
+#include "dtb.h"
 #define BUFF_MAX 1000
-
-void kernel_main(void) {
+//initialize value to prevent being wiped out by memzero
+void *dtb_ptr_glob = NULL;
+void kernel_main(){
     
     uart_init();
-    parse_newc((uint8_t*)0x20000000);
-   
+    if (dtb_ptr_glob == NULL)uart_send_string("dtb not found");
+    else {
+        init_device_tree(dtb_ptr_glob); 
+    }
+    parse_newc((uint8_t*)CPIO_DEFAULT_START);
+    
     char buffer[BUFF_MAX];
     int cnt = 0;
     while (1) {

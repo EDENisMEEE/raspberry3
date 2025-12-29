@@ -16,6 +16,8 @@
 
 #include "stdint.h"
 #include "stddef.h"
+#include "string.h"
+#include "mini_uart.h"
 
 /* ============================================================
  * 1. FDT constants (from Devicetree specification)
@@ -57,10 +59,10 @@ struct fdt_header {
 
 struct fdt_callbacks {
     /* Called when a node starts */
-    void (*begin_node)(const char *name, int depth, void *userdata);
+    void (*begin_node)(char *name, int depth, void *userdata);
 
     /* Called for each property */
-    void (*property)(const char *name,
+    void (*property)(char *name,
                      const void *value,
                      uint32_t length,
                      int depth,
@@ -77,7 +79,7 @@ struct fdt_callbacks {
 
 /* Convert big-endian 32-bit integer to CPU endianness */
 /* rpi3 is a little endian CPU */
-static uint32_t be32_to_cpu(uint32_t be)
+uint32_t be32_to_cpu(uint32_t be)
 {
     return ((be & 0x000000FFU) << 24) |
            ((be & 0x0000FF00U) << 8)  |
@@ -108,7 +110,16 @@ int fdt_parse(const void *dtb,
 
     /* ---- Step 1: Validate header ---- */
     if (be32_to_cpu(hdr->magic) != FDT_MAGIC)
-        return -1; /* Not a valid FDT */
+    {   uint32_t *header = (uint32_t *)dtb;
+        uint32_t magic = be32_to_cpu(header[0]);
+
+        uart_send_string("DTB Address: ");
+        uart_hex((uintptr_t)dtb);
+        uart_send_string("\nRaw Magic: ");
+        uart_hex(magic);
+        uart_send_string("\n");
+        uart_send_string("invalid header, not dtb");
+        return -1; /* Not a valid FDT */}
 
     /* Locate structure and strings blocks */
     const uint8_t *struct_ptr = base + be32_to_cpu(hdr->off_dt_struct);
@@ -119,6 +130,7 @@ int fdt_parse(const void *dtb,
 
     /* ---- Step 2: Walk structure block token by token ---- */
     while (struct_ptr < struct_end) {
+        // token is a 4-byte big endian integer
         uint32_t token = be32_to_cpu(*(const uint32_t *)struct_ptr);
         struct_ptr += 4;
 
@@ -126,7 +138,7 @@ int fdt_parse(const void *dtb,
 
         case FDT_BEGIN_NODE: {
             /* Node name is a NULL-terminated string */
-            const char *name = (const char *)struct_ptr;
+            char *name = (char *)struct_ptr;
 
             if (cb && cb->begin_node)
                 cb->begin_node(name, depth, userdata);
@@ -158,7 +170,7 @@ int fdt_parse(const void *dtb,
             struct_ptr += 4;
 
             const void *value = struct_ptr;
-            const char *name = strings + nameoff;
+            char *name = strings + nameoff;
 
             if (cb && cb->property)
                 cb->property(name, value, len, depth - 1, userdata);
