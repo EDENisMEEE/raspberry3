@@ -19,6 +19,8 @@ without relying on an underlying OS or standard libraries. This work follows the
 - [Bootloader self-relocation](https://hackmd.io/n3EEbRmQT9yhS2kfo25JNw)
 - [Device Tree]()
 
+### Lab3 Exception and Interrupt
+- [Exception](https://hackmd.io/87os06wBRHGme6Rs1inapA)
 
 ## Architecture Overview
 - Target platform: Raspberry Pi (ARM architecture)
